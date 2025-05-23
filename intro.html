@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Introduction du Quizz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .character {
+      max-width: 200px;
+      height: auto;
+      margin-bottom: 20px;
+    }
+
+    .speech {
+      background-color: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      max-width: 600px;
+      font-size: 18px;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-top: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 250px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
+      background-color: #0078d7;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🧍 Image du personnage (à remplacer dès que tu m’envoies l’image) -->
+  <img src="personnage.png" alt="Personnage du quizz" class="character">
+
+  <!-- 💬 Texte de bienvenue -->
+  <div class="speech">
+    Bonjour et bienvenue dans ce Quizz <strong>Vrai ou Faux</strong> des <strong>Procédures de caisse</strong>.<br><br>
+    Vous allez voir à l'écran des affirmations.<br>
+    À vous de voir si celle-ci est <strong>Vraie</strong>... ou <strong>Fausse</strong>.<br><br>
+    <em>À vous de jouer !</em>
+  </div>
+
+  <!-- 👤 Formulaire -->
+  <div class="form-group">
+    <input type="text" id="playerName" placeholder="Nom du joueur">
+    <br>
+    <button onclick="startGame()">Démarrer</button>
+  </div>
+
+  <script>
+    function startGame() {
+      const name = document.getElementById('playerName').value.trim();
+      if (name === "") {
+        alert("Merci de renseigner votre nom avant de commencer !");
+        return;
+      }
+      // Sauvegarde du nom si besoin
+      localStorage.setItem("playerName", name);
+      window.location.href = "quizz.html";
+    }
+  </script>
+
+</body>
+</html>
