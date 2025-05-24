@@ -149,7 +149,7 @@
 
       document.getElementById("end-screen").style.display = "flex";
 
-     const reponsesFinales = quiz.map((q, i) =>
+const reponsesFinales = quiz.map((q, i) =>
   q.reponse === reponsesUtilisateur[i] ? "✔️" : "❌"
 );
 
@@ -159,22 +159,28 @@ const data = {
   reponses: reponsesFinales
 };
 
-fetch("https://script.google.com/macros/s/AKfycbybROlUMgxg2DsgHmpZE5h21lyZOxqLaL8o2-Ox5O9CMmlJZLXfaIUkOFWd40OCFUmTtw/exec", {
+// Construction du tableau pour NoCodeAPI
+const ligne = [data.nom, data.score, ...data.reponses];
+
+fetch("https://v1.nocodeapi.com/lizasau/google_sheets/aJQHIUJBhguVKtbE?tabId=Réponses", {
   method: "POST",
-  body: JSON.stringify(data),
   headers: {
     "Content-Type": "application/json"
-  }
+  },
+  body: JSON.stringify({
+    data: [ligne]
+  })
 })
-.then(response => response.text())
-.then(text => {
-  console.log("✅ Données enregistrées :", text);
+.then(res => res.json())
+.then(data => {
+  console.log("✅ Enregistré via NoCodeAPI :", data);
   document.getElementById("final-message").innerHTML += "<br><small style='color:green;'>✅ Résultat enregistré dans la base.</small>";
 })
-.catch(error => {
-  console.error("❌ Erreur d’enregistrement :", error);
+.catch(err => {
+  console.error("❌ Erreur NoCodeAPI :", err);
   document.getElementById("final-message").innerHTML += "<br><small style='color:red;'>⚠️ Enregistrement impossible.</small>";
 });
+
 
     }
 
