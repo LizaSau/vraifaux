@@ -15,12 +15,10 @@
       flex-direction: column;
       align-items: center;
     }
-
     .character {
       max-width: 150px;
       margin-bottom: 10px;
     }
-
     .speech-bubble {
       background: white;
       padding: 20px;
@@ -30,13 +28,11 @@
       font-size: 18px;
       margin-bottom: 20px;
     }
-
     .quiz-image {
       max-width: 300px;
       width: 100%;
       margin-bottom: 30px;
     }
-
     .buttons {
       display: flex;
       gap: 30px;
@@ -44,7 +40,6 @@
       flex-wrap: wrap;
       justify-content: center;
     }
-
     .btn {
       padding: 15px 30px;
       font-size: 20px;
@@ -54,19 +49,15 @@
       color: white;
       min-width: 120px;
     }
-
     .btn-true {
       background-color: #28a745;
     }
-
     .btn-false {
       background-color: #dc3545;
     }
-
     .btn:hover {
       opacity: 0.9;
     }
-
     #end-screen {
       display: none;
       flex-direction: column;
@@ -77,7 +68,6 @@
   </style>
 </head>
 <body>
-
   <img src="personnage.png" alt="Formatrice Carrefour" class="character" id="perso">
   <div class="speech-bubble" id="affirmation"></div>
   <img src="" alt="Illustration" class="quiz-image" id="illustration">
@@ -86,7 +76,6 @@
     <button class="btn btn-false" onclick="repondre(false)">FAUX</button>
   </div>
 
-  <!-- Écran de fin -->
   <div id="end-screen">
     <img src="personnage.png" alt="Formatrice Carrefour" class="character">
     <div class="speech-bubble" id="final-message"></div>
@@ -148,20 +137,22 @@
 
       document.getElementById("end-screen").style.display = "flex";
 
-      const ligne = [nom, score, ...reponsesUtilisateur];
-
-      fetch("https://v1.nocodeapi.com/lizasau/google_sheets/aJQHIUJBhguVKtbE?tabId=Réponses", {
+      fetch("https://script.google.com/macros/s/AKfycbyiV5vGB9B4XBd6WsoPFgnMNO5Dw-gOFhLs6kN2Cc6bnXnDtO251M0U3K362C8Pa6KNfg/exec", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: [ligne] })
+        body: JSON.stringify({
+          nom: nom,
+          score: score,
+          reponses: reponsesUtilisateur
+        })
       })
-      .then(res => res.json())
+      .then(res => res.text())
       .then(data => {
         console.log("✅ Enregistrement réussi :", data);
         document.getElementById("final-message").innerHTML += `<br><span style="color:green">✅ Résultat enregistré dans la base.</span>`;
       })
       .catch(error => {
-        console.error("❌ Erreur NoCodeAPI :", error);
+        console.error("❌ Erreur Google Script :", error);
         document.getElementById("final-message").innerHTML += `<br><span style="color:red">⚠️ Enregistrement impossible.</span>`;
       });
     }
