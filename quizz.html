@@ -125,39 +125,40 @@
       else afficherFin();
     }
 
-    function afficherFin() {
-      document.getElementById("perso").style.display = "none";
-      document.getElementById("affirmation").style.display = "none";
-      document.getElementById("illustration").style.display = "none";
-      document.getElementById("quiz-buttons").style.display = "none";
+<script>
+  function afficherFin() {
+    document.getElementById("perso").style.display = "none";
+    document.getElementById("affirmation").style.display = "none";
+    document.getElementById("illustration").style.display = "none";
+    document.getElementById("quiz-buttons").style.display = "none";
 
-      const nom = localStorage.getItem("playerName") || "joueur";
-      document.getElementById("final-message").innerHTML =
-        `Merci ${nom} de votre participation.<br>Votre score est de ${score} bonnes réponses.`;
+    const nom = localStorage.getItem("playerName") || "joueur";
+    document.getElementById("final-message").innerHTML =
+      `Merci ${nom} de votre participation.<br>Votre score est de ${score} bonnes réponses.`;
 
-      document.getElementById("end-screen").style.display = "flex";
+    document.getElementById("end-screen").style.display = "flex";
 
-      fetch("https://script.google.com/macros/s/AKfycbyiV5vGB9B4XBd6WsoPFgnMNO5Dw-gOFhLs6kN2Cc6bnXnDtO251M0U3K362C8Pa6KNfg/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nom: nom,
-          score: score,
-          reponses: reponsesUtilisateur
-        })
+    // Appel Apps Script (et non plus NoCodeAPI)
+    fetch("https://script.google.com/macros/s/AKfycbyiV5vGB9B4XBd6WsoPFgnMNO5Dw-gOFhLs6kN2Cc6bnXnDtO251M0U3K362C8Pa6KNfg/exec", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nom: nom,
+        score: score,
+        reponses: reponsesUtilisateur
       })
-      .then(res => res.text())
-      .then(data => {
-        console.log("✅ Enregistrement réussi :", data);
-        document.getElementById("final-message").innerHTML += `<br><span style="color:green">✅ Résultat enregistré dans la base.</span>`;
-      })
-      .catch(error => {
-        console.error("❌ Erreur Google Script :", error);
-        document.getElementById("final-message").innerHTML += `<br><span style="color:red">⚠️ Enregistrement impossible.</span>`;
-      });
-    }
+    })
+    .then(res => res.text())
+    .then(data => {
+      console.log("✅ Réponse Apps Script :", data);
+      document.getElementById("final-message").innerHTML += `<br><span style="color:green">✅ Résultat enregistré dans la base.</span>`;
+    })
+    .catch(error => {
+      console.error("❌ Erreur d'envoi :", error);
+      document.getElementById("final-message").innerHTML += `<br><span style="color:red">⚠️ Enregistrement impossible.</span>`;
+    });
+  }
+</script>
 
-    window.onload = afficherQuestion;
-  </script>
 </body>
 </html>
