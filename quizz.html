@@ -7,14 +7,13 @@
   <style>
     body {
       margin: 0;
-      padding: 0;
+      padding: 20px;
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px;
     }
 
     .character {
@@ -130,7 +129,7 @@
 
     function repondre(reponseUtilisateur) {
       const bonneReponse = quiz[index].reponse;
-      reponsesUtilisateur.push(reponseUtilisateur);
+      reponsesUtilisateur.push(reponseUtilisateur === bonneReponse ? "✔️" : "❌");
       if (reponseUtilisateur === bonneReponse) score++;
       index++;
       if (index < quiz.length) afficherQuestion();
@@ -149,43 +148,25 @@
 
       document.getElementById("end-screen").style.display = "flex";
 
-const reponsesFinales = quiz.map((q, i) =>
-  q.reponse === reponsesUtilisateur[i] ? "✔️" : "❌"
-);
+      const ligne = [nom, score, ...reponsesUtilisateur];
 
-const data = {
-  nom: nom,
-  score: score,
-  reponses: reponsesFinales
-};
-
-// Construction du tableau pour NoCodeAPI
-const ligne = [data.nom, data.score, ...data.reponses];
-
-fetch("https://v1.nocodeapi.com/lizasau/google_sheets/aJQHIUJBhguVKtbE?tabId=Réponses", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    data: [ligne]
-  })
-})
-.then(res => res.json())
-.then(data => {
-  console.log("✅ Enregistré via NoCodeAPI :", data);
-  document.getElementById("final-message").innerHTML += "<br><small style='color:green;'>✅ Résultat enregistré dans la base.</small>";
-})
-.catch(err => {
-  console.error("❌ Erreur NoCodeAPI :", err);
-  document.getElementById("final-message").innerHTML += "<br><small style='color:red;'>⚠️ Enregistrement impossible.</small>";
-});
-
-
+      fetch("https://v1.nocodeapi.com/lizasau/google_sheets/aJQHIUJBhguVKtbE?tabId=Réponses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: [ligne] })
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log("✅ Enregistrement réussi :", data);
+        document.getElementById("final-message").innerHTML += `<br><span style="color:green">✅ Résultat enregistré dans la base.</span>`;
+      })
+      .catch(error => {
+        console.error("❌ Erreur NoCodeAPI :", error);
+        document.getElementById("final-message").innerHTML += `<br><span style="color:red">⚠️ Enregistrement impossible.</span>`;
+      });
     }
 
     window.onload = afficherQuestion;
   </script>
-
 </body>
 </html>
