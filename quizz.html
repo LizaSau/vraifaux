@@ -2,154 +2,102 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Quizz Vrai ou Faux</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau des Scores</title>
   <style>
     body {
-      margin: 0;
-      padding: 20px;
       font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
+      margin: 40px;
+      background: #f9f9f9;
       text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
-    .character {
-      max-width: 150px;
-      margin-bottom: 10px;
-    }
-    .speech-bubble {
+
+    table {
+      margin: auto;
+      border-collapse: collapse;
+      width: 90%;
+      max-width: 1000px;
       background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      max-width: 90%;
-      font-size: 18px;
-      margin-bottom: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    .quiz-image {
-      max-width: 300px;
-      width: 100%;
-      margin-bottom: 30px;
-    }
-    .buttons {
-      display: flex;
-      gap: 30px;
-      margin-top: 20px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .btn {
-      padding: 15px 30px;
-      font-size: 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      color: white;
-      min-width: 120px;
-    }
-    .btn-true {
-      background-color: #28a745;
-    }
-    .btn-false {
-      background-color: #dc3545;
-    }
-    .btn:hover {
-      opacity: 0.9;
-    }
-    #end-screen {
-      display: none;
-      flex-direction: column;
-      align-items: center;
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
       text-align: center;
-      margin-top: 30px;
+    }
+
+    th {
+      background-color: #0078d7;
+      color: white;
+    }
+
+    .bonne {
+      background-color: #d4edda; /* vert clair */
+    }
+
+    .mauvaise {
+      background-color: #f8d7da; /* rouge clair */
     }
   </style>
 </head>
 <body>
 
-  <img src="personnage.png" alt="Formatrice Carrefour" class="character" id="perso">
-  <div class="speech-bubble" id="affirmation"></div>
-  <img src="" alt="Illustration" class="quiz-image" id="illustration">
-  <div class="buttons" id="quiz-buttons">
-    <button class="btn btn-true" onclick="repondre(true)">VRAI</button>
-    <button class="btn btn-false" onclick="repondre(false)">FAUX</button>
-  </div>
+  <h1>Résultats du Quiz</h1>
 
-  <div id="end-screen">
-    <img src="personnage.png" alt="Formatrice Carrefour" class="character">
-    <div class="speech-bubble" id="final-message"></div>
-    <button onclick="window.location.href='index.html'" class="btn" style="margin-top: 20px; background-color: #0078d7;">Retour à l'accueil</button>
-  </div>
-
-  <!-- FORMULAIRE CACHÉ pour contournement CORS -->
-  <form id="resultForm" method="POST" action="https://script.google.com/macros/s/AKfycbzZ9XndOQfNROTWfPrjC68ZbWrJL3hjP0vZV8UmBFvByQzRnwNgR1XzFFQwA-FhPpkf/exec" target="hiddenFrame">
-    <input type="hidden" name="nom" id="form-nom">
-    <input type="hidden" name="score" id="form-score">
-    <input type="hidden" name="reponses" id="form-reponses">
-  </form>
-  <iframe name="hiddenFrame" style="display:none;"></iframe>
+  <table>
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>Score</th>
+        <th>Q1</th>
+        <th>Q2</th>
+        <th>Q3</th>
+        <th>Q4</th>
+        <th>Q5</th>
+        <th>Q6</th>
+        <th>Q7</th>
+        <th>Q8</th>
+        <th>Q9</th>
+        <th>Q10</th>
+      </tr>
+    </thead>
+    <tbody id="score-rows">
+      <tr><td colspan="12">Chargement des données...</td></tr>
+    </tbody>
+  </table>
 
   <script>
-    const quiz = [
-      { texte: "L'hôtesse de caisse doit toujours badger en début de poste.", image: "carte.png", reponse: true },
-      { texte: "Il est autorisé de prêter son badge à un collègue.", image: "carte.png", reponse: false },
-      { texte: "Le fond de caisse doit être vérifié avant l'ouverture.", image: "erreur.png", reponse: true },
-      { texte: "On peut encaisser un billet de 500 € sans autorisation.", image: "erreur.png", reponse: false },
-      { texte: "Le ticket de caisse est obligatoire pour tout échange ou remboursement.", image: "erreur.png", reponse: true },
-      { texte: "Il est interdit de manger en caisse.", image: "hotesse.png", reponse: true },
-      { texte: "On peut utiliser son téléphone personnel pendant les encaissements.", image: "hotesse.png", reponse: false },
-      { texte: "L'appel d'un responsable est nécessaire pour une erreur de rendu monnaie.", image: "caisse.png", reponse: true },
-      { texte: "L'encaissement d'un chèque est autorisé sans pièce d'identité.", image: "caisse.png", reponse: false },
-      { texte: "Il faut signaler toute anomalie sur le matériel dès sa découverte.", image: "caisse.png", reponse: true }
-    ];
+    function fetchScoresFromSheet() {
+      const sheetId = "1M969CU-HL9DsU7MhZ2GwaRyxk4jtClAGSB0vKHDxNuQ";
+      const sheetName = "Réponses";
+      const url = `https://opensheet.elk.sh/${sheetId}/${sheetName}`;
 
-    let index = 0;
-    let score = 0;
-    let reponsesUtilisateur = [];
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          const rows = data.map(s => {
+            // Construction des réponses avec classes selon 1/0
+            const reponses = Object.keys(s)
+              .filter(k => k !== "nom" && k !== "score")
+              .map(k => {
+                const val = s[k];
+                const classe = val === "1" ? "bonne" : "mauvaise";
+                return `<td class="${classe}">${val}</td>`;
+              }).join('');
 
-    function afficherQuestion() {
-      const question = quiz[index];
-      document.getElementById("affirmation").textContent = question.texte;
-      document.getElementById("illustration").src = question.image || "";
+            return `<tr><td>${s.nom}</td><td>${s.score}</td>${reponses}</tr>`;
+          }).join('');
+
+          document.getElementById('score-rows').innerHTML = rows;
+        })
+        .catch(err => {
+          document.getElementById('score-rows').innerHTML =
+            `<tr><td colspan="12">❌ Erreur de chargement des données</td></tr>`;
+          console.error("Erreur de récupération :", err);
+        });
     }
 
-    function repondre(reponseUtilisateur) {
-      const bonneReponse = quiz[index].reponse;
-      reponsesUtilisateur.push(reponseUtilisateur === bonneReponse ? "1" : "0");
-      if (reponseUtilisateur === bonneReponse) score++;
-      index++;
-      if (index < quiz.length) {
-        afficherQuestion();
-      } else {
-        afficherFin();
-      }
-    }
-
-    function afficherFin() {
-      document.getElementById("perso").style.display = "none";
-      document.getElementById("affirmation").style.display = "none";
-      document.getElementById("illustration").style.display = "none";
-      document.getElementById("quiz-buttons").style.display = "none";
-
-      const nom = localStorage.getItem("playerName") || "joueur";
-      document.getElementById("final-message").innerHTML =
-        `Merci ${nom} de votre participation.<br>Votre score est de ${score} bonnes réponses.`;
-
-      document.getElementById("end-screen").style.display = "flex";
-
-      // Remplissage du formulaire caché
-      document.getElementById("form-nom").value = nom;
-      document.getElementById("form-score").value = score;
-      document.getElementById("form-reponses").value = reponsesUtilisateur.join(",");
-
-      // Envoi
-      document.getElementById("resultForm").submit();
-      document.getElementById("final-message").innerHTML += `<br><span style="color:green">✅ Résultat envoyé (via formulaire).</span>`;
-    }
-
-    window.onload = afficherQuestion;
+    window.onload = fetchScoresFromSheet;
   </script>
 
 </body>
