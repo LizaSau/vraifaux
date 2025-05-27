@@ -83,6 +83,14 @@
     <button onclick="window.location.href='index.html'" class="btn" style="margin-top: 20px; background-color: #0078d7;">Retour à l'accueil</button>
   </div>
 
+  <!-- FORMULAIRE CACHÉ pour contournement CORS -->
+  <form id="resultForm" method="POST" action="https://script.google.com/macros/s/AKfycbxyFTKRvM_P6_2D3rihFY_RqFXzfqtJI_KFMKS_muBNgSvXMQQvGoY_7Sz5DkuKng/exec" target="hiddenFrame">
+    <input type="hidden" name="nom" id="form-nom">
+    <input type="hidden" name="score" id="form-score">
+    <input type="hidden" name="reponses" id="form-reponses">
+  </form>
+  <iframe name="hiddenFrame" style="display:none;"></iframe>
+
   <script>
     const quiz = [
       { texte: "L'hôtesse de caisse doit toujours badger en début de poste.", image: "carte.png", reponse: true },
@@ -131,24 +139,14 @@
 
       document.getElementById("end-screen").style.display = "flex";
 
-     fetch("https://script.google.com/macros/s/AKfycbxyFTKRvM_P6_2D3rihFY_RqFXzfqtJI_KFMKS_muBNgSvXMQQvGoY_7Sz5DkuKng/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nom: nom,
-          score: score,
-          reponses: reponsesUtilisateur
-        })
-      })
-      .then(res => res.text())
-      .then(data => {
-        console.log("✅ Réponse Apps Script :", data);
-        document.getElementById("final-message").innerHTML += `<br><span style="color:green">✅ Résultat enregistré dans la base.</span>`;
-      })
-      .catch(error => {
-        console.error("❌ Erreur d'envoi :", error);
-        document.getElementById("final-message").innerHTML += `<br><span style="color:red">⚠️ Enregistrement impossible.</span>`;
-      });
+      // Remplissage du formulaire caché
+      document.getElementById("form-nom").value = nom;
+      document.getElementById("form-score").value = score;
+      document.getElementById("form-reponses").value = reponsesUtilisateur.join(",");
+
+      // Envoi
+      document.getElementById("resultForm").submit();
+      document.getElementById("final-message").innerHTML += `<br><span style="color:green">✅ Résultat envoyé (via formulaire).</span>`;
     }
 
     window.onload = afficherQuestion;
